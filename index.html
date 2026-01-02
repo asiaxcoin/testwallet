@@ -11,169 +11,75 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        html, body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; width: 100%; position: relative; touch-action: pan-y; }
+        html, body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .gold-grad-text { background: linear-gradient(180deg, #FFD700 0%, #B8860B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .bg-card { background-color: #0D0D0D; border: 1px solid #1A1A1A; border-radius: 12px; }
-        .btn-gold { background: linear-gradient(180deg, #FFD700 0%, #B8860B 100%); color: #000; font-weight: bold; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .btn-cyan { background: #00F5FF; color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; }
-        .input-box { background: #111; border: 1px solid #222; color: #fff; border-radius: 6px; padding: 12px; width: 100%; font-size: 13px; }
-        .app-container { max-width: 410px; margin: 0 auto; padding: 12px; overflow-x: hidden; }
-        .box-header-logo { width: 150px; height: auto; margin: 25px auto 10px auto; display: block; }
-        .timer-row { display: flex; justify-content: center; align-items: center; gap: 12px; background: #080808; padding: 12px; border-radius: 8px; border: 1px solid #222; }
-        .timer-part { display: flex; align-items: baseline; gap: 2px; }
-        .timer-val { font-size: 24px; font-weight: 900; color: #f3ba2f; line-height: 1; }
-        .timer-label { font-size: 10px; color: #666; text-transform: uppercase; font-weight: bold; }
-        .circle-lg { width: 85px; height: 85px; border: 4px solid #151515; border-top-color: #f3ba2f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; margin: 0 auto; font-weight: bold; }
-        .pool-dot { width: 35px; height: 35px; border: 2px solid #222; border-top-color: #f3ba2f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: bold; transition: 0.3s; }
-        .pool-done { border-top-color: #22c55e !important; color: #22c55e !important; border-color: #22c55e; }
-        .roi-progress-bg { width: 100%; background: #1A1A1A; height: 8px; border-radius: 10px; margin-top: 10px; overflow: hidden; border: 1px solid #222; }
-        .roi-progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #00F5FF); width: 0%; transition: width 0.5s; }
-        .soc-img-container { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; transition: 0.2s; cursor: pointer; }
-        .soc-img-container img { width: 100%; height: 100%; object-fit: cover; }
+        .bg-card { background-color: #0D0D0D; border: 1px solid #1A1A1A; border-radius: 12px; margin-bottom: 15px; padding: 15px; }
+        .btn-gold { background: linear-gradient(180deg, #FFD700 0%, #B8860B 100%); color: #000; font-weight: bold; border-radius: 8px; width: 100%; padding: 10px; cursor: pointer; text-align: center; }
+        .input-box { background: #111; border: 1px solid #222; color: #fff; border-radius: 6px; padding: 12px; width: 100%; font-size: 13px; margin-top: 5px; }
+        .app-container { max-width: 410px; margin: 0 auto; padding: 12px; }
+        .box-header-logo { width: 140px; margin: 20px auto 10px; display: block; }
+        .roi-progress-bg { width: 100%; background: #1A1A1A; height: 8px; border-radius: 10px; margin-top: 10px; border: 1px solid #222; overflow: hidden; }
+        .roi-progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #00F5FF); width: 0%; transition: 0.5s; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="flex flex-col items-center py-6">
-        <img src="prologo.png" style="width: 150px; height: auto;" alt="Logo">
-        <button id="walletBtn" class="mt-4 btn-gold w-full py-1.5 uppercase text-[11px] tracking-widest shadow-lg">1Connect Wallet</button>
+    <div class="text-center py-4">
+        <img src="prologo.png" class="mx-auto mb-4" style="width: 150px;">
+        <button id="walletBtn" class="btn-gold">CONNECT WALLET</button>
     </div>
 
-    <div class="bg-card p-4 mb-4 border-[#222]">
-        <div class="space-y-3">
-            <div>
-                <p class="text-[9px] text-gray-500 uppercase font-bold mb-1 ml-1">My Address</p>
-                <div class="input-box flex justify-between items-center opacity-60">
-                    <span id="userAddr" class="truncate text-[10px]">0x0000...0000</span>
-                    <i class="fa-solid fa-clone text-[10px] cursor-pointer" onclick="copyText('userAddr')"></i>
-                </div>
-            </div>
-            <div>
-                <p class="text-[9px] text-gray-500 uppercase font-bold mb-1 ml-1">Upline Address</p>
-                <div class="input-box flex justify-between items-center opacity-60">
-                    <span id="uplineAddrDisplay" class="truncate text-[10px]">0x0000...0000</span>
-                    <i class="fa-solid fa-link text-[10px]"></i>
-                </div>
-            </div>
-        </div>
+    <div class="bg-card">
+        <p class="text-[10px] text-gray-500 uppercase font-bold">My Wallet Address</p>
+        <div id="userAddr" class="input-box truncate">Not Connected</div>
+        
+        <p class="text-[10px] text-gray-500 uppercase font-bold mt-3">Upline</p>
+        <div id="uplineAddrDisplay" class="input-box truncate">0x000...000</div>
     </div>
 
     <img src="income.png" class="box-header-logo">
-    <div class="bg-card p-6 mb-4 text-center border-[#222]">
-        <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">Total Income Earned</p>
-        <h2 class="text-4xl font-bold mt-2"><span id="totalIncomeDisplay">0.00</span> <span class="text-sm gold-grad-text italic font-bold">AX</span></h2>
-        <div class="grid grid-cols-5 gap-0 mt-8">
-            <div class="text-center"><i class="fa-solid fa-bolt text-yellow-500 text-lg"></i><p class="text-[7px] text-gray-500 uppercase">ROI</p></div>
-            <div class="text-center"><i class="fa-solid fa-crown text-yellow-600 text-lg"></i><p class="text-[7px] text-gray-500 uppercase">Sponsor</p></div>
-            <div class="text-center"><i class="fa-solid fa-users-rays text-yellow-700 text-lg"></i><p class="text-[7px] text-gray-500 uppercase">Gen</p></div>
-            <div class="text-center"><i class="fa-solid fa-trophy text-yellow-500 text-lg"></i><p class="text-[7px] text-gray-500 uppercase">Pools</p></div>
-            <div class="text-center"><i class="fa-solid fa-star text-yellow-400 text-lg"></i><p class="text-[7px] text-gray-500 uppercase">Top</p></div>
-        </div>
+    <div class="bg-card text-center">
+        <p class="text-[10px] text-gray-400 uppercase tracking-widest">Total Income</p>
+        <h2 class="text-3xl font-bold mt-2"><span id="totalIncomeDisplay">0.00</span> <span class="gold-grad-text">AX</span></h2>
     </div>
 
     <img src="invest.png" class="box-header-logo">
-    <div class="bg-card p-4 mb-4 border-[#222]">
-        <div class="flex justify-between items-center mb-1">
-            <p class="text-[10px] text-gray-400 uppercase font-bold">Your Investments</p>
-            <p class="text-[8px] text-cyan-400 font-bold uppercase">ROI Limit (175%): <span id="roiLimitDisplay">0.00</span> AX</p>
-        </div>
-        <div class="flex justify-between items-end">
-            <div>
-                <p class="text-[9px] text-gray-500 uppercase">Total Deposit</p>
-                <h3 class="text-xl font-bold" id="totalDeposit">0.00 AX</h3>
-            </div>
-            <div class="text-right">
-                <p class="text-[9px] text-gray-500 uppercase">ROI Withdrawn</p>
-                <h3 class="text-xl font-bold gold-grad-text"><span id="roiEarnedDisplay">0.00</span> AX</h3>
-                <p class="text-[8px] text-gray-500 font-bold uppercase"><span id="roiRemainingPercent">100</span>% REMAINING</p>
-            </div>
+    <div class="bg-card">
+        <div class="flex justify-between text-[10px] mb-2">
+            <span>DEPOSIT: <b id="totalDeposit">0.00 AX</b></span>
+            <span class="text-cyan-400">LIMIT: <b id="roiLimitDisplay">0.00</b></span>
         </div>
         <div class="roi-progress-bg"><div id="roiBar" class="roi-progress-fill"></div></div>
     </div>
 
     <img src="reffer.png" class="box-header-logo">
-    <div class="mb-4">
-        <p class="text-[9px] text-gray-500 uppercase font-bold mb-1 ml-1">Your Referral Link</p>
-        <div class="flex gap-1">
-            <input type="text" id="refLink" readonly value="Connect Wallet" class="input-box flex-1 py-2 text-[10px] border-[#222]">
-            <button onclick="copyText('refLink')" class="btn-gold px-4 text-[10px]">COPY</button>
-        </div>
+    <div class="flex gap-2 mb-4">
+        <input type="text" id="refLink" readonly class="input-box flex-1" value="Connect First">
+        <button onclick="copyText('refLink')" class="btn-gold !w-20">COPY</button>
     </div>
 
-    <img src="with.png" class="box-header-logo">
-    <div class="bg-card p-4 mb-4 border-[#222]">
-        <p class="text-[10px] text-gray-400 uppercase font-bold mb-3">Withdraw to your wallet</p>
-        <div class="relative">
-            <input type="number" id="withdrawInput" placeholder="Amount (AX)" class="input-box pr-16 text-cyan-400 font-bold">
-            <button onclick="setMaxWithdraw()" class="absolute right-3 top-3 text-cyan-400 font-bold text-[11px]">MAX</button>
-        </div>
-        <button onclick="walletWithdraw()" class="btn-gold w-full py-2.5 mt-3 text-xs uppercase">Confirm Withdrawal</button>
-        <div class="text-center mt-4">
-            <p class="text-[9px] text-gray-500 uppercase font-bold">Available in Internal Wallet</p>
-            <h4 class="text-2xl font-bold mt-1" id="contractWalletBal">0.00 AX</h4>
-        </div>
+    <div class="bg-card">
+        <p class="text-[11px] mb-2">Buy AsiaX (Fixed Swap)</p>
+        <input type="number" id="buyUsdtInput" placeholder="USDT Amount" class="input-box mb-3">
+        <button onclick="buyAsiaXFix()" class="btn-gold !bg-cyan-500">BUY NOW</button>
     </div>
 
-    <div class="bg-card p-4 mb-4 space-y-4 border-[#222]">
-        <div class="flex justify-between items-center text-[11px] font-bold uppercase">
-            <span class="text-gray-500">Pending ROI</span><span id="roiInc">0.00 AX</span>
-        </div>
-        <div class="flex justify-between items-center text-[11px] font-bold uppercase">
-            <span class="text-gray-500">Sponsor Income</span><span id="spInc">0.00 AX</span>
-        </div>
-        <div class="flex justify-between items-center text-[11px] font-bold uppercase">
-            <span class="text-gray-500">Generations Income</span><span id="genInc">0.00 AX</span>
-        </div>
-        <div class="flex justify-between items-center text-[11px] font-bold uppercase">
-            <span class="text-gray-500">Pool Income</span><span id="poolInc">0.00 AX</span>
-        </div>
-        <div class="flex gap-2 pt-2">
-            <button onclick="claimPoolRewards()" class="btn-gold flex-1 py-1.5 text-[9px] uppercase font-black">Claim Pools</button>
-            <button onclick="withdrawIncome()" class="btn-cyan flex-1 py-1.5 text-[9px] uppercase font-black">Claim ROI/Team</button>
-        </div>
-    </div>
-
-    <img src="buy.png" class="box-header-logo">
-    <div class="bg-card p-4 mb-4 border-[#222]">
-        <div class="flex justify-between items-center mb-4">
-            <span class="text-[10px] text-gray-400 uppercase font-bold italic">Buy FIX</span>
-            <span class="text-cyan-400 text-[10px] font-bold">1 USDT = <span id="fixRateDisplay">--</span> AX</span>
-        </div>
-        <div class="relative mb-2">
-            <input type="number" id="buyUsdtInput" oninput="calculateSwap()" placeholder="USDT Amount" class="input-box pr-16 text-xs">
-            <button onclick="setMaxUsdt()" class="absolute right-3 top-3 text-cyan-400 font-bold text-[11px]">MAX</button>
-        </div>
-        <div class="text-[10px] text-center text-gray-500 mb-3">Receive: <span id="estAx" class="text-white font-bold">0.00</span> AX</div>
-        <button onclick="buyAsiaXFix()" class="btn-gold w-full py-3 text-xs">BUY ASIAX FIX</button>
-    </div>
-
-    <img src="join.png" class="box-header-logo">
-    <div class="bg-card p-4 mb-4 border-[#222]">
-        <input type="text" id="uplineInput" placeholder="Referrer Address" class="input-box mb-2 text-xs italic">
-        <div class="relative">
-            <input type="number" id="investAmount" placeholder="Amount (AX)" class="input-box pr-16 text-xs">
-            <button onclick="setMaxInvest()" class="absolute right-3 top-3 text-cyan-400 font-bold text-[11px]">MAX</button>
-        </div>
-        <button onclick="invest()" class="btn-cyan w-full py-3 mt-4 text-xs uppercase">Invest Now</button>
-    </div>
-
-    <div class="bg-card p-4 mb-4 border-[#222] grid grid-cols-3 text-center gap-2">
-        <div><p class="text-[8px] text-gray-500 uppercase">ASIAX</p><h5 id="bal-asiax" class="text-sm font-bold">0.00</h5></div>
-        <div><p class="text-[8px] text-gray-500 uppercase">USDT</p><h5 id="bal-usdt" class="text-sm font-bold">0.00</h5></div>
-        <div><p class="text-[8px] text-gray-500 uppercase">POL</p><h5 id="bal-pol" class="text-sm font-bold">0.00</h5></div>
+    <div class="bg-card">
+        <p class="text-[11px] mb-2">Invest in Network</p>
+        <input type="text" id="uplineInput" placeholder="Referrer Address" class="input-box mb-2">
+        <input type="number" id="investAmount" placeholder="AX Amount" class="input-box mb-3">
+        <button onclick="invest()" class="btn-gold">INVEST NOW</button>
     </div>
 </div>
 
 <script>
-    // --- 1. CONFIGURATION ---
+    // --- SETTINGS ---
+    const projectId = '5027711be910730eaeaf1e49cd7a2b69'; // <--- APNI PROJECT ID YAHAN DALO
     const MAIN_ADDR = "0xF6d0d72AAf0Bbf5C459E680f1e6E75E3B1ce1f06";
-    const BUY_FIX_ADDR = "0xCA275a92B4845f3caD2995FaeC00733849C4e6D1"; 
+    const BUY_FIX_ADDR = "0xCA275a92B4845f3caD2995FaeC00733849C4e6D1";
     const TOKEN_ADDR = "0xE36b5223d488322fAc2dDda937E5aB226E83Fbbd";
     const USDT_ADDR = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
-
-    // PROJECT ID - Replace this with yours from cloud.reown.com
-    const projectId = '5027711be910730eaeaf1e49cd7a2b69'; 
 
     const polygon = {
       chainId: 137,
@@ -183,138 +89,99 @@
       rpcUrl: 'https://polygon-rpc.com'
     };
 
-    // --- 2. INITIALIZE MODAL ---
+    // --- INITIALIZE WEB3MODAL ---
     const { createWeb3Modal, defaultConfig } = window.Web3ModalEthers;
     const modal = createWeb3Modal({
-      ethersConfig: defaultConfig({ metadata: { name: 'AsiaX Pro', url: window.location.origin, icons: [] } }),
+      ethersConfig: defaultConfig({ 
+          metadata: { name: 'AsiaX Pro', description: 'Dashboard', url: window.location.origin, icons: [] } 
+      }),
       chains: [polygon],
-      projectId
+      projectId: projectId,
+      themeMode: 'dark'
     });
 
-    let signer, provider, mainContract, buyFixContract, tokenContract, usdtContract;
-    let currentRate = 0;
+    let provider, signer, mainContract, tokenContract, usdtContract, buyFixContract;
 
-    // ABI definitions (Combined from your original)
-    const ABI = [
-        "function invest(address _referrer, uint256 _amount) external",
-        "function withdraw() external",
-        "function WalletWithdraw(uint256 _amount) external",
-        "function claimPoolRewards() external",
-        "function userBasic(address) view returns (address referrer, uint256 totalInvestment, uint256 firstInvestmentTime, uint256 lastROICalculation, uint256 totalWithdrawn, uint256 sponsorIncome, uint256 generationIncome, uint256 totalROIWithdrawn, uint256 totalPoolIncomeWithdrawn, uint256 totalSponsorWithdrawn, uint256 totalGenerationWithdrawn)",
-        "function userNetwork(address) view returns (uint256 totalTeam, uint256 activeDirects, bool silverPoolMember, bool goldPoolMember, bool platinumPoolMember, uint256 silverPoolJoinTime, uint256 goldPoolJoinTime, uint256 platinumPoolJoinTime)",
-        "function getUserIncome(address _user) view returns (uint256 pendingROI, uint256 sponsorInc, uint256 generationInc, uint256 poolRewards, uint256 totalWithdrawn)",
-        "function userWallet(address) view returns (uint256 balance, uint256 lastWithdrawalTime, uint256 withdrawnInLast24Hours)",
-        "function getBusinessAndAmount(address) view returns (uint256[50] levelBusiness, uint256[50] levelCount)"
-    ];
-    const BUY_FIX_ABI = ["function buyAsiaX(uint256 usdtAmount) external", "function getHumanPrice() view returns (uint256)"];
-    const ERC20_ABI = ["function balanceOf(address owner) view returns (uint256)", "function approve(address spender, uint256 amount) returns (bool)"];
-
-    const nF = (v, d=18) => {
-        try { return parseFloat(ethers.formatUnits(v || 0, d)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}); } 
-        catch(e) { return "0.00"; }
-    };
-
-    // --- 3. CONNECTION LOGIC ---
-    async function initSession() {
+    // --- CORE FUNCTIONS ---
+    async function startLogic() {
         const walletProvider = modal.getWalletProvider();
         if (!walletProvider) return;
 
         provider = new ethers.BrowserProvider(walletProvider);
         signer = await provider.getSigner();
-        const addr = await signer.getAddress();
+        const address = await signer.getAddress();
+
+        // UI Update
+        document.getElementById('userAddr').innerText = address;
+        document.getElementById('walletBtn').innerText = address.substring(0,6) + "..." + address.substring(38);
+        document.getElementById('refLink').value = window.location.origin + window.location.pathname + "?ref=" + address;
 
         // Init Contracts
-        mainContract = new ethers.Contract(MAIN_ADDR, ABI, signer);
-        buyFixContract = new ethers.Contract(BUY_FIX_ADDR, BUY_FIX_ABI, signer);
-        tokenContract = new ethers.Contract(TOKEN_ADDR, ERC20_ABI, signer);
-        usdtContract = new ethers.Contract(USDT_ADDR, ERC20_ABI, signer);
+        const simpleABI = [
+            "function userBasic(address) view returns (address referrer, uint256 totalInvestment, uint256 firstInvestmentTime, uint256 lastROICalculation, uint256 totalWithdrawn, uint256 sponsorIncome, uint256 generationIncome, uint256 totalROIWithdrawn, uint256 totalPoolIncomeWithdrawn, uint256 totalSponsorWithdrawn, uint256 totalGenerationWithdrawn)",
+            "function getUserIncome(address) view returns (uint256 pendingROI, uint256 sponsorInc, uint256 generationInc, uint256 poolRewards, uint256 totalWithdrawn)",
+            "function invest(address, uint256) external",
+            "function approve(address, uint256) external returns (bool)",
+            "function buyAsiaX(uint256) external"
+        ];
 
-        // UI Updates
-        document.getElementById('walletBtn').innerText = addr.substring(0,6)+"..."+addr.substring(addr.length-4);
-        document.getElementById('userAddr').innerText = addr;
-        document.getElementById('refLink').value = window.location.origin + window.location.pathname + "?ref=" + addr;
+        mainContract = new ethers.Contract(MAIN_ADDR, simpleABI, signer);
+        tokenContract = new ethers.Contract(TOKEN_ADDR, simpleABI, signer);
+        usdtContract = new ethers.Contract(USDT_ADDR, simpleABI, signer);
+        buyFixContract = new ethers.Contract(BUY_FIX_ADDR, simpleABI, signer);
 
-        loadData(addr);
+        loadUserData(address);
     }
 
-    // Button Click
-    document.getElementById('walletBtn').addEventListener('click', async () => {
-        await modal.open();
-    });
-
-    // Listen for connection
-    modal.subscribeProvider(({ isConnected }) => {
-        if (isConnected) initSession();
-    });
-
-    // --- 4. DATA LOADING ---
-    async function loadData(addr) {
+    async function loadUserData(addr) {
         try {
-            const [basic, income, wallet, polBal, tokenBal, usdtBal] = await Promise.all([
-                mainContract.userBasic(addr),
-                mainContract.getUserIncome(addr),
-                mainContract.userWallet(addr),
-                provider.getBalance(addr),
-                tokenContract.balanceOf(addr),
-                usdtContract.balanceOf(addr)
-            ]);
-
+            const basic = await mainContract.userBasic(addr);
+            const income = await mainContract.getUserIncome(addr);
+            
             document.getElementById('uplineAddrDisplay').innerText = basic.referrer;
-            document.getElementById('bal-pol').innerText = nF(polBal);
-            document.getElementById('bal-asiax').innerText = nF(tokenBal);
-            document.getElementById('bal-usdt').innerText = nF(usdtBal, 6);
-
-            // Investment ROI Progress
-            const deposit = basic.totalInvestment;
-            const maxROI = (deposit * 175n) / 100n;
-            document.getElementById('totalDeposit').innerText = nF(deposit) + " AX";
-            document.getElementById('roiLimitDisplay').innerText = nF(maxROI);
-            document.getElementById('roiEarnedDisplay').innerText = nF(basic.totalROIWithdrawn);
-
-            // Incomes
-            document.getElementById('totalIncomeDisplay').innerText = nF(income.totalWithdrawn);
-            document.getElementById('roiInc').innerText = nF(income.pendingROI) + " AX";
-            document.getElementById('spInc').innerText = nF(income.sponsorInc) + " AX";
-            document.getElementById('contractWalletBal').innerText = nF(wallet.balance) + " AX";
-
-            const rate = await buyFixContract.getHumanPrice();
-            currentRate = Number(rate);
-            document.getElementById('fixRateDisplay').innerText = currentRate;
-        } catch (e) { console.error(e); }
+            document.getElementById('totalDeposit').innerText = ethers.formatUnits(basic.totalInvestment, 18) + " AX";
+            document.getElementById('totalIncomeDisplay').innerText = ethers.formatUnits(income.totalWithdrawn, 18);
+            
+            // Progress Bar
+            const invested = Number(ethers.formatUnits(basic.totalInvestment, 18));
+            if(invested > 0) {
+                const limit = invested * 1.75;
+                const withdrawn = Number(ethers.formatUnits(basic.totalROIWithdrawn, 18));
+                const percent = (withdrawn / limit) * 100;
+                document.getElementById('roiBar').style.width = Math.min(percent, 100) + "%";
+                document.getElementById('roiLimitDisplay').innerText = limit.toFixed(2);
+            }
+        } catch(e) { console.error(e); }
     }
 
-    // --- 5. CONTRACT ACTIONS ---
+    // --- BUTTON ACTIONS ---
+    document.getElementById('walletBtn').onclick = () => modal.open();
+
+    modal.subscribeProvider(({ isConnected }) => {
+        if (isConnected) startLogic();
+    });
+
     async function invest() {
         const amt = document.getElementById('investAmount').value;
-        if(!amt || amt < 10) return alert("Min 10 AX");
+        const ref = document.getElementById('uplineInput').value || "0x0000000000000000000000000000000000000000";
+        if(!amt) return alert("Enter amount");
         try {
-            const wei = ethers.parseUnits(amt, 18);
-            await (await tokenContract.approve(MAIN_ADDR, wei)).wait();
-            await (await mainContract.invest(document.getElementById('uplineInput').value || "0x0000000000000000000000000000000000000000", wei)).wait();
-            alert("Success!"); initSession();
-        } catch(e) { alert("Failed"); }
-    }
-
-    async function walletWithdraw() {
-        const amt = document.getElementById('withdrawInput').value;
-        try {
-            await (await mainContract.WalletWithdraw(ethers.parseUnits(amt, 18))).wait();
-            alert("Withdrawn!"); initSession();
-        } catch(e) { alert("Error"); }
-    }
-
-    function calculateSwap() {
-        document.getElementById('estAx').innerText = (document.getElementById('buyUsdtInput').value * currentRate).toFixed(2);
+            const val = ethers.parseUnits(amt, 18);
+            await (await tokenContract.approve(MAIN_ADDR, val)).wait();
+            await (await mainContract.invest(ref, val)).wait();
+            alert("Invested!"); startLogic();
+        } catch(e) { alert("Error in transaction"); }
     }
 
     function copyText(id) {
-        const text = document.getElementById(id).innerText || document.getElementById(id).value;
-        navigator.clipboard.writeText(text);
+        const input = document.getElementById(id);
+        input.select();
+        navigator.clipboard.writeText(input.value);
         alert("Copied!");
     }
-    
-    // Auto-check if already connected on load
-    window.addEventListener('load', initSession);
+
+    // Check on load
+    window.onload = startLogic;
 </script>
 </body>
 </html>
