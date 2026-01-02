@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AsiaX Pro Dashboard</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@web3modal/ethers@5.1.5/dist/index.global.js"></script>
@@ -35,7 +35,7 @@
     <div class="bg-card">
         <p class="text-[9px] text-gray-500 uppercase font-bold">My Address</p>
         <div id="userAddr" class="input-box truncate">0x000...000</div>
-        
+
         <p class="text-[9px] text-gray-500 uppercase font-bold mt-3">Upline</p>
         <div id="uplineAddrDisplay" class="input-box truncate">0x000...000</div>
     </div>
@@ -78,7 +78,7 @@
 
 <script>
     // --- 1. CONFIGURATION ---
-    const projectId = '03a163dd191beb8051bf05273501ae42'; // Your ID Fixed
+    const projectId = '03a163dd191beb8051bf05273501ae42'; 
     const MAIN_ADDR = "0xF6d0d72AAf0Bbf5C459E680f1e6E75E3B1ce1f06";
     const TOKEN_ADDR = "0xE36b5223d488322fAc2dDda937E5aB226E83Fbbd";
 
@@ -90,19 +90,6 @@
       rpcUrl: 'https://polygon-rpc.com'
     };
 
-    // --- 2. WEB3MODAL SETUP ---
-    const { createWeb3Modal, defaultConfig } = window.Web3ModalEthers;
-    const modal = createWeb3Modal({
-      ethersConfig: defaultConfig({ 
-          metadata: { name: 'AsiaX Pro', description: 'Dashboard', url: window.location.origin, icons: [] } 
-      }),
-      chains: [polygon],
-      projectId,
-      themeMode: 'dark'
-    });
-
-    let provider, signer, mainContract, tokenContract;
-
     const ABI = [
         "function invest(address, uint256) external",
         "function WalletWithdraw(uint256) external",
@@ -112,40 +99,65 @@
         "function approve(address, uint256) external returns (bool)"
     ];
 
+    // --- 2. WEB3MODAL SETUP ---
+    const { createWeb3Modal, defaultConfig } = window.Web3ModalEthers;
+    const modal = createWeb3Modal({
+      ethersConfig: defaultConfig({ 
+          metadata: { 
+              name: 'AsiaX Pro', 
+              description: 'Dashboard', 
+              url: window.location.origin, 
+              icons: ['https://avatars.githubusercontent.com/u/37784886'] 
+          } 
+      }),
+      chains: [polygon],
+      projectId,
+      themeMode: 'dark'
+    });
+
+    let provider, signer, mainContract, tokenContract;
+
     // --- 3. CORE LOGIC ---
     async function initDashboard() {
-        const walletProvider = modal.getWalletProvider();
-        if (!walletProvider) return;
+        try {
+            const walletProvider = modal.getWalletProvider();
+            if (!walletProvider) return;
 
-        provider = new ethers.BrowserProvider(walletProvider);
-        signer = await provider.getSigner();
-        const address = await signer.getAddress();
+            provider = new ethers.BrowserProvider(walletProvider);
+            signer = await provider.getSigner();
+            const address = await signer.getAddress();
 
-        // UI Update
-        document.getElementById('userAddr').innerText = address;
-        document.getElementById('walletBtn').innerText = address.substring(0,6) + "..." + address.substring(38);
-        document.getElementById('statusTxt').innerText = "Wallet Connected ✅";
-        document.getElementById('refLink').value = window.location.origin + window.location.pathname + "?ref=" + address;
+            // UI Update
+            document.getElementById('userAddr').innerText = address;
+            document.getElementById('walletBtn').innerText = address.substring(0,6) + "..." + address.substring(38);
+            document.getElementById('statusTxt').innerText = "Wallet Connected ✅";
+            document.getElementById('refLink').value = window.location.origin + window.location.pathname + "?ref=" + address;
 
-        // Init Contracts
-        mainContract = new ethers.Contract(MAIN_ADDR, ABI, signer);
-        tokenContract = new ethers.Contract(TOKEN_ADDR, ABI, signer);
+            // Init Contracts
+            mainContract = new ethers.Contract(MAIN_ADDR, ABI, signer);
+            tokenContract = new ethers.Contract(TOKEN_ADDR, ABI, signer);
 
-        loadData(address);
+            loadData(address);
+        } catch (e) {
+            console.error("Initialization Error:", e);
+        }
     }
 
     // Connect Button Listener
     document.getElementById('walletBtn').addEventListener('click', async () => {
-        try {
-            await modal.open();
-        } catch (e) {
-            alert("Connection error. Check if popups are allowed.");
-        }
+        const state = modal.getState();
+        if (state.open) return;
+        await modal.open();
     });
 
-    // Listen for connection success
-    modal.subscribeProvider(({ isConnected }) => {
-        if (isConnected) initDashboard();
+    // Sahi tareeka connection subscribe karne ka
+    modal.subscribeProvider(({ isConnected, address }) => {
+        if (isConnected && address) {
+            initDashboard();
+        } else {
+            document.getElementById('statusTxt').innerText = "Disconnected";
+            document.getElementById('walletBtn').innerText = "Connect Wallet";
+        }
     });
 
     async function loadData(addr) {
@@ -161,7 +173,6 @@
             document.getElementById('totalIncomeDisplay').innerText = ethers.formatUnits(income.totalWithdrawn, 18);
             document.getElementById('contractWalletBal').innerText = ethers.formatUnits(wallet.balance, 18);
 
-            // Progress Bar Logic
             const invested = Number(ethers.formatUnits(basic.totalInvestment, 18));
             if(invested > 0) {
                 const limit = invested * 1.75;
@@ -173,7 +184,7 @@
         } catch (e) { console.error("Load Data Error:", e); }
     }
 
-    // --- 4. TRANSACTIONS ---
+    // Transactions Logic
     async function invest() {
         const amt = document.getElementById('investAmount').value;
         const ref = document.getElementById('uplineInput').value || "0x0000000000000000000000000000000000000000";
@@ -183,16 +194,15 @@
             document.getElementById('statusTxt').innerText = "Approving Token...";
             const tx1 = await tokenContract.approve(MAIN_ADDR, val);
             await tx1.wait();
-            
+
             document.getElementById('statusTxt').innerText = "Confirming Investment...";
             const tx2 = await mainContract.invest(ref, val);
             await tx2.wait();
-            
+
             alert("Investment Successful!");
             initDashboard();
         } catch(e) { 
-            console.error(e);
-            alert("Transaction Failed!"); 
+            alert("Transaction Failed! Check Balance/Gas."); 
             document.getElementById('statusTxt').innerText = "Transaction Error";
         }
     }
@@ -215,8 +225,10 @@
         alert("Copied!");
     }
 
-    // Auto-init if already connected
-    window.onload = initDashboard;
+    // Page load hone par check karein agar pehle se connected hai
+    window.addEventListener('load', () => {
+        setTimeout(initDashboard, 1000); 
+    });
 </script>
 
 </body>
