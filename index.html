@@ -2,235 +2,126 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AsiaX Pro Dashboard</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WalletConnect Test</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@web3modal/ethers@5.1.5/dist/index.global.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        html, body { background-color: #000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .gold-grad-text { background: linear-gradient(180deg, #FFD700 0%, #B8860B 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .bg-card { background-color: #0D0D0D; border: 1px solid #1A1A1A; border-radius: 12px; margin-bottom: 12px; padding: 15px; }
-        .btn-gold { background: linear-gradient(180deg, #FFD700 0%, #B8860B 100%); color: #000; font-weight: bold; border-radius: 8px; width: 100%; padding: 10px; cursor: pointer; text-align: center; border: none; }
-        .btn-cyan { background: #00F5FF; color: #000; font-weight: bold; border-radius: 8px; width: 100%; padding: 10px; cursor: pointer; border: none; }
-        .input-box { background: #111; border: 1px solid #222; color: #fff; border-radius: 6px; padding: 12px; width: 100%; font-size: 13px; margin-top: 5px; }
-        .app-container { max-width: 410px; margin: 0 auto; padding: 12px; }
-        .box-header-logo { width: 150px; margin: 25px auto 10px; display: block; }
-        .roi-progress-bg { width: 100%; background: #1A1A1A; height: 8px; border-radius: 10px; margin-top: 10px; overflow: hidden; border: 1px solid #222; }
-        .roi-progress-fill { height: 100%; background: linear-gradient(90deg, #22c55e, #00F5FF); width: 0%; transition: 0.5s; }
-    </style>
 </head>
-<body>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen">
 
-<div class="app-container">
-    <div class="text-center py-6">
-        <img src="prologo.png" style="width: 150px; margin: 0 auto;" alt="Logo">
-        <button id="walletBtn" class="mt-4 btn-gold uppercase text-[11px] tracking-widest">Connect Wallet</button>
-        <p id="statusTxt" class="text-[9px] text-gray-500 mt-2 italic">Waiting for connection...</p>
-    </div>
-
-    <div class="bg-card">
-        <p class="text-[9px] text-gray-500 uppercase font-bold">My Address</p>
-        <div id="userAddr" class="input-box truncate">0x000...000</div>
-
-        <p class="text-[9px] text-gray-500 uppercase font-bold mt-3">Upline</p>
-        <div id="uplineAddrDisplay" class="input-box truncate">0x000...000</div>
-    </div>
-
-    <img src="income.png" class="box-header-logo">
-    <div class="bg-card text-center">
-        <p class="text-[10px] text-gray-400 uppercase tracking-widest">Total Income Earned</p>
-        <h2 class="text-4xl font-bold mt-2"><span id="totalIncomeDisplay">0.00</span> <span class="text-sm gold-grad-text italic font-bold">AX</span></h2>
-    </div>
-
-    <img src="invest.png" class="box-header-logo">
-    <div class="bg-card">
-        <div class="flex justify-between text-[10px] mb-1 uppercase font-bold">
-            <span>Deposit: <b id="totalDeposit">0.00</b></span>
-            <span class="text-cyan-400">Limit: <b id="roiLimitDisplay">0.00</b></span>
+    <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md text-center border border-gray-700">
+        <h1 class="text-2xl font-bold mb-6 text-cyan-400">Connection Tester</h1>
+        
+        <div id="connectionStatus" class="mb-4 text-sm text-gray-400">
+            Status: <span id="statusText" class="text-red-500 font-bold">Disconnected</span>
         </div>
-        <div class="roi-progress-bg"><div id="roiBar" class="roi-progress-fill"></div></div>
+
+        <div id="walletInfo" class="hidden mb-6 p-4 bg-gray-900 rounded-lg break-all text-xs text-green-400 border border-green-900">
+            <p class="font-bold text-gray-500 mb-1 uppercase">Connected Address:</p>
+            <span id="userAddress">0x...</span>
+        </div>
+
+        <button id="connectBtn" class="w-full bg-cyan-500 hover:bg-cyan-600 text-black font-bold py-3 rounded-xl transition-all">
+            Connect Wallet
+        </button>
+        
+        <button id="disconnectBtn" class="hidden w-full mt-4 bg-red-500/20 hover:bg-red-500/40 text-red-500 font-bold py-2 rounded-xl transition-all">
+            Disconnect
+        </button>
+
+        <p class="mt-6 text-[10px] text-gray-500 italic">
+            Make sure your Project ID is whitelisted on cloud.walletconnect.com
+        </p>
     </div>
 
-    <img src="reffer.png" class="box-header-logo">
-    <div class="flex gap-2 mb-4">
-        <input type="text" id="refLink" readonly value="Connect Wallet First" class="input-box flex-1">
-        <button onclick="copyText('refLink')" class="btn-gold !w-20 text-[10px]">COPY</button>
-    </div>
+    <script>
+        // 1. Apni Project ID yahan paste karein
+        const projectId = '03a163dd191beb8051bf05273501ae42';
 
-    <div class="bg-card">
-        <p class="text-[11px] font-bold mb-2 gold-grad-text">INVEST NOW</p>
-        <input type="text" id="uplineInput" placeholder="Referrer Address" class="input-box mb-2">
-        <input type="number" id="investAmount" placeholder="Amount AX" class="input-box mb-3">
-        <button onclick="invest()" class="btn-cyan">INVEST NOW</button>
-    </div>
+        // 2. Network Setup (Polygon)
+        const polygon = {
+          chainId: 137,
+          name: 'Polygon',
+          currency: 'POL',
+          explorerUrl: 'https://polygonscan.com',
+          rpcUrl: 'https://polygon-rpc.com'
+        };
 
-    <img src="with.png" class="box-header-logo">
-    <div class="bg-card">
-        <input type="number" id="withdrawInput" placeholder="Amount AX" class="input-box mb-3">
-        <button onclick="walletWithdraw()" class="btn-gold">CONFIRM WITHDRAWAL</button>
-        <p class="text-center text-[10px] text-gray-500 mt-3">Available: <span id="contractWalletBal">0.00</span> AX</p>
-    </div>
-</div>
+        // 3. Web3Modal Configuration
+        const { createWeb3Modal, defaultConfig } = window.Web3ModalEthers;
+        const modal = createWeb3Modal({
+          ethersConfig: defaultConfig({ 
+              metadata: { 
+                  name: 'Test Project', 
+                  description: 'Testing WalletConnect ID', 
+                  url: window.location.origin, 
+                  icons: ['https://avatars.githubusercontent.com/u/37784886'] 
+              } 
+          }),
+          chains: [polygon],
+          projectId,
+          themeMode: 'dark'
+        });
 
-<script>
-    // --- 1. CONFIGURATION ---
-    const projectId = '03a163dd191beb8051bf05273501ae42'; 
-    const MAIN_ADDR = "0xF6d0d72AAf0Bbf5C459E680f1e6E75E3B1ce1f06";
-    const TOKEN_ADDR = "0xE36b5223d488322fAc2dDda937E5aB226E83Fbbd";
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const statusText = document.getElementById('statusText');
+        const walletInfo = document.getElementById('walletInfo');
+        const userAddress = document.getElementById('userAddress');
 
-    const polygon = {
-      chainId: 137,
-      name: 'Polygon',
-      currency: 'POL',
-      explorerUrl: 'https://polygonscan.com',
-      rpcUrl: 'https://polygon-rpc.com'
-    };
-
-    const ABI = [
-        "function invest(address, uint256) external",
-        "function WalletWithdraw(uint256) external",
-        "function userBasic(address) view returns (address referrer, uint256 totalInvestment, uint256 firstInvestmentTime, uint256 lastROICalculation, uint256 totalWithdrawn, uint256 sponsorIncome, uint256 generationIncome, uint256 totalROIWithdrawn, uint256 totalPoolIncomeWithdrawn, uint256 totalSponsorWithdrawn, uint256 totalGenerationWithdrawn)",
-        "function getUserIncome(address) view returns (uint256 pendingROI, uint256 sponsorInc, uint256 generationInc, uint256 poolRewards, uint256 totalWithdrawn)",
-        "function userWallet(address) view returns (uint256 balance, uint256 lastWithdrawalTime, uint256 withdrawnInLast24Hours)",
-        "function approve(address, uint256) external returns (bool)"
-    ];
-
-    // --- 2. WEB3MODAL SETUP ---
-    const { createWeb3Modal, defaultConfig } = window.Web3ModalEthers;
-    const modal = createWeb3Modal({
-      ethersConfig: defaultConfig({ 
-          metadata: { 
-              name: 'AsiaX Pro', 
-              description: 'Dashboard', 
-              url: window.location.origin, 
-              icons: ['https://avatars.githubusercontent.com/u/37784886'] 
-          } 
-      }),
-      chains: [polygon],
-      projectId,
-      themeMode: 'dark'
-    });
-
-    let provider, signer, mainContract, tokenContract;
-
-    // --- 3. CORE LOGIC ---
-    async function initDashboard() {
-        try {
+        // 4. Update UI Function
+        async function updateUI() {
             const walletProvider = modal.getWalletProvider();
-            if (!walletProvider) return;
+            const isConnected = modal.getIsConnected();
 
-            provider = new ethers.BrowserProvider(walletProvider);
-            signer = await provider.getSigner();
-            const address = await signer.getAddress();
+            if (isConnected && walletProvider) {
+                const provider = new ethers.BrowserProvider(walletProvider);
+                const signer = await provider.getSigner();
+                const address = await signer.getAddress();
 
-            // UI Update
-            document.getElementById('userAddr').innerText = address;
-            document.getElementById('walletBtn').innerText = address.substring(0,6) + "..." + address.substring(38);
-            document.getElementById('statusTxt').innerText = "Wallet Connected ✅";
-            document.getElementById('refLink').value = window.location.origin + window.location.pathname + "?ref=" + address;
-
-            // Init Contracts
-            mainContract = new ethers.Contract(MAIN_ADDR, ABI, signer);
-            tokenContract = new ethers.Contract(TOKEN_ADDR, ABI, signer);
-
-            loadData(address);
-        } catch (e) {
-            console.error("Initialization Error:", e);
-        }
-    }
-
-    // Connect Button Listener
-    document.getElementById('walletBtn').addEventListener('click', async () => {
-        const state = modal.getState();
-        if (state.open) return;
-        await modal.open();
-    });
-
-    // Sahi tareeka connection subscribe karne ka
-    modal.subscribeProvider(({ isConnected, address }) => {
-        if (isConnected && address) {
-            initDashboard();
-        } else {
-            document.getElementById('statusTxt').innerText = "Disconnected";
-            document.getElementById('walletBtn').innerText = "Connect Wallet";
-        }
-    });
-
-    async function loadData(addr) {
-        try {
-            const [basic, income, wallet] = await Promise.all([
-                mainContract.userBasic(addr),
-                mainContract.getUserIncome(addr),
-                mainContract.userWallet(addr)
-            ]);
-
-            document.getElementById('uplineAddrDisplay').innerText = basic.referrer;
-            document.getElementById('totalDeposit').innerText = ethers.formatUnits(basic.totalInvestment, 18) + " AX";
-            document.getElementById('totalIncomeDisplay').innerText = ethers.formatUnits(income.totalWithdrawn, 18);
-            document.getElementById('contractWalletBal').innerText = ethers.formatUnits(wallet.balance, 18);
-
-            const invested = Number(ethers.formatUnits(basic.totalInvestment, 18));
-            if(invested > 0) {
-                const limit = invested * 1.75;
-                const withdrawn = Number(ethers.formatUnits(basic.totalROIWithdrawn, 18));
-                const percent = (withdrawn / limit) * 100;
-                document.getElementById('roiBar').style.width = Math.min(percent, 100) + "%";
-                document.getElementById('roiLimitDisplay').innerText = limit.toFixed(2);
+                statusText.innerText = "Connected ✅";
+                statusText.className = "text-green-500 font-bold";
+                userAddress.innerText = address;
+                
+                walletInfo.classList.remove('hidden');
+                disconnectBtn.classList.remove('hidden');
+                connectBtn.innerText = "Wallet Connected";
+                connectBtn.disabled = true;
+            } else {
+                statusText.innerText = "Disconnected";
+                statusText.className = "text-red-500 font-bold";
+                walletInfo.classList.add('hidden');
+                disconnectBtn.classList.add('hidden');
+                connectBtn.innerText = "Connect Wallet";
+                connectBtn.disabled = false;
             }
-        } catch (e) { console.error("Load Data Error:", e); }
-    }
-
-    // Transactions Logic
-    async function invest() {
-        const amt = document.getElementById('investAmount').value;
-        const ref = document.getElementById('uplineInput').value || "0x0000000000000000000000000000000000000000";
-        if(!amt) return alert("Enter amount");
-        try {
-            const val = ethers.parseUnits(amt, 18);
-            document.getElementById('statusTxt').innerText = "Approving Token...";
-            const tx1 = await tokenContract.approve(MAIN_ADDR, val);
-            await tx1.wait();
-
-            document.getElementById('statusTxt').innerText = "Confirming Investment...";
-            const tx2 = await mainContract.invest(ref, val);
-            await tx2.wait();
-
-            alert("Investment Successful!");
-            initDashboard();
-        } catch(e) { 
-            alert("Transaction Failed! Check Balance/Gas."); 
-            document.getElementById('statusTxt').innerText = "Transaction Error";
         }
-    }
 
-    async function walletWithdraw() {
-        const amt = document.getElementById('withdrawInput').value;
-        if(!amt) return alert("Enter amount");
-        try {
-            const tx = await mainContract.WalletWithdraw(ethers.parseUnits(amt, 18));
-            await tx.wait();
-            alert("Withdrawal Successful!");
-            initDashboard();
-        } catch(e) { alert("Withdrawal Failed"); }
-    }
+        // 5. Button Listeners
+        connectBtn.addEventListener('click', async () => {
+            try {
+                await modal.open();
+            } catch (err) {
+                console.error("Modal Error:", err);
+            }
+        });
 
-    function copyText(id) {
-        const el = document.getElementById(id);
-        const val = el.tagName === 'INPUT' ? el.value : el.innerText;
-        navigator.clipboard.writeText(val);
-        alert("Copied!");
-    }
+        disconnectBtn.addEventListener('click', async () => {
+            await modal.disconnect();
+            location.reload(); // Refresh to clear state
+        });
 
-    // Page load hone par check karein agar pehle se connected hai
-    window.addEventListener('load', () => {
-        setTimeout(initDashboard, 1000); 
-    });
-</script>
+        // 6. Watch for changes
+        modal.subscribeProvider(({ isConnected }) => {
+            updateUI();
+        });
 
+        // Check on initial load
+        window.addEventListener('load', () => {
+            setTimeout(updateUI, 1000);
+        });
+    </script>
 </body>
 </html>
-
